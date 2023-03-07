@@ -54,7 +54,7 @@ class App extends React.Component {
         <Form.Control id="cityName" type="text" onChange={this.handleChange}></Form.Control>
         <Button type='submit'>Explore!</Button>
       </Form>
-      <Card style={{width: '17rem'}}>
+      <Card>
         <Card.Img src={mapURL} alt="Map of Chosen City" style={this.state.isMapOpen ? {} : { display: 'none' }} ></Card.Img>
         <Card.Body>
         <Card.Title>{`City: ${this.state.cityData.display_name}`}</Card.Title>
