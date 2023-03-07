@@ -13,9 +13,9 @@ class App extends React.Component {
       cityName: '',
       latitude: '',
       longitude: '',
+      isMapOpen: false,
       error: false,
-      errorMessage: ''
-
+      errorMessage: '',
     }
   }
 
@@ -26,8 +26,6 @@ class App extends React.Component {
     })
   }
 
-  
-
   handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -35,17 +33,20 @@ class App extends React.Component {
       this.setState({
         cityData: myData.data[0],
         latitude: this.state.cityData.lat,
-        longitude: this.state.cityData.lon
+        longitude: this.state.cityData.lon,
+        isMapOpen: true
       })
-      console.log(this.state.cityData)
     } catch (error) {
       this.setState({
         error: true,
         errorMessage: `Error: ${error.response.status}`
       })
     }
+
 }
   render() {
+    let mapURL = `https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_API_KEY}&center=${this.state.cityData.lat},${this.state.cityData.lon}&zoom=12`
+
     return (
       <>
       <Form onSubmit={this.handleSubmit}>
@@ -53,7 +54,8 @@ class App extends React.Component {
         <Form.Control id="cityName" type="text" onChange={this.handleChange}></Form.Control>
         <Button type='submit'>Explore!</Button>
       </Form>
-      <Card>
+      <Card style={{width: '17rem'}}>
+        <Card.Img src={mapURL} alt="Map of Chosen City" style={this.state.isMapOpen ? {} : { display: 'none' }} ></Card.Img>
         <Card.Body>
         <Card.Title>{`City: ${this.state.cityData.display_name}`}</Card.Title>
         <Card.Text>{`Latitude: ${this.state.cityData.lat}`}</Card.Text>
