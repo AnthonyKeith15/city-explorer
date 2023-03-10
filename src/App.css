@@ -23,13 +23,16 @@ label.form-label{
   width: 50%;
 }
 .card-body{
-  background-color: red;
+  background-color: mediumslateblue;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
+.card {
+  color: white;
+}
 img.card-img{
   margin: auto;
   width: 600px;
