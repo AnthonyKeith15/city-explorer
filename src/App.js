@@ -1,71 +1,67 @@
 import React from 'react';
 import './App.css';
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
-import Card from 'react-bootstrap/Card'
 import axios from 'axios'
+import SearchResults from './SearchResults';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cityData: {display_name: 'Choose Your City', lat: 'East/West Coordinates', lon: 'North/South Coordinates'},
-      cityName: '',
-      latitude: '',
-      longitude: '',
-      isMapOpen: false,
-      error: false,
-      errorMessage: '',
+      userCityChoice: '',
+      userCityData: [],
+      userCityDataName: '',
+      userCityDataLat: '',
+      userCityDataLon: '',
+      cityMapURL: '',
+      weatherData: '',
+      isError: false,
     }
-  }
-
-  handleChange = (e) => {
-    this.setState
-    ({
-      cityName: e.target.value,
-    })
-  }
-
-  handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      let myData = await axios.get(`https://us1.locationiq.com/v1/search?key=${process.env.REACT_APP_LOCATIONIQ_API_KEY}&q=${this.state.cityName}&format=json`)
+  
+    this.handleCityChoiceChange = (e) => {
       this.setState({
-        cityData: myData.data[0],
-        latitude: this.state.cityData.lat,
-        longitude: this.state.cityData.lon,
-        isMapOpen: true
-      })
-    } catch (error) {
-      this.setState({
-        error: true,
-        errorMessage: `Error: ${error.response.status}`
+        userCityChoice: e.target.value
       })
     }
 
-}
+
+
+    this.handleFormSubmit = async (e) => {
+      e.preventDefault();
+      try {
+        // let weatherData = await axios.get(`${process.env.REACT_APP_SERVER}/?city=${this.state.userCityChoice}`);
+
+        let userCityChoiceData = await axios.get(`https://us1.locationiq.com/v1/search?key=${process.env.REACT_APP_LOCATIONIQ_API_KEY}&q=${this.state.userCityChoice}&format=json`);
+
+        let movieData = await axios.get(`${process.env.REACT_APP_SERVER}/movie?movieSearch=${this.state.userCityChoice}`)
+
+
+        this.setState({
+          // weatherData: weatherData.data,
+          userCityData: userCityChoiceData.data[0],
+          userCityDataName: userCityChoiceData.data[0].display_name,
+          userCityDataLat: userCityChoiceData.data[0].lat,
+          userCityDataLon: userCityChoiceData.data[0].lon,
+        })
+        console.log(movieData);
+      } catch (error) {
+        alert(`Sorry, you have an error of ${error.response.status}`)
+      }
+    }
+  }
+  
+  
   render() {
-    let mapURL = `https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_API_KEY}&center=${this.state.cityData.lat},${this.state.cityData.lon}&zoom=12`
-
     return (
       <>
-      <Form onSubmit={this.handleSubmit}>
-        <Form.Label for="cityName">Choose a City</Form.Label>
-        <Form.Control id="cityName" type="text" onChange={this.handleChange}></Form.Control>
-        <Button type='submit'>Explore!</Button>
-      </Form>
-      <Card>
-        <Card.Img src={mapURL} alt="Map of Chosen City" style={this.state.isMapOpen ? {} : { display: 'none' }} ></Card.Img>
-        <Card.Body>
-        <Card.Title>{`City: ${this.state.cityData.display_name}`}</Card.Title>
-        <Card.Text>{`Latitude: ${this.state.cityData.lat}`}</Card.Text>
-        <Card.Text>{`Longitude: ${this.state.cityData.lon}`}</Card.Text>
-        </Card.Body>
-      </Card>
+        <form onSubmit={this.handleFormSubmit}>
+          <label for='userCityChoice'>Choose A City
+            <input type='text' id='userCityChoice' onChange={this.handleCityChoiceChange}></input>
+          </label>
+          <button type='submit'>Let's Go</button>
+        </form>
+        <SearchResults city={this.state.userCityDataName} lat={this.state.userCityDataLat} lon={this.state.userCityDataLon} />
       </>
-  
-    );
-
+    )
   }
 }
 
