@@ -7,47 +7,78 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      userCityChoice: '',
-      userCityData: [],
-      userCityDataName: '',
-      userCityDataLat: '',
-      userCityDataLon: '',
-      cityMapURL: '',
-      weatherData: '',
-      isError: false,
+      searchQuery: '',
+      cityObject: {},
+      cityLat: '',
+      cityLon: '',
+      weatherObject: [],
+      movieObjectArr: [],
     }
-  
+    // TODO ORGANIZE DATA ON FRONT END
     this.handleCityChoiceChange = (e) => {
       this.setState({
-        userCityChoice: e.target.value
+        searchQuery: e.target.value
       })
+      
     }
 
 
 
     this.handleFormSubmit = async (e) => {
       e.preventDefault();
-      try {
-        // let weatherData = await axios.get(`${process.env.REACT_APP_SERVER}/?city=${this.state.userCityChoice}`);
+      this.getCityObject();
+      // weatherFunction
+      this.getMovieObject();
 
-        let userCityChoiceData = await axios.get(`https://us1.locationiq.com/v1/search?key=${process.env.REACT_APP_LOCATIONIQ_API_KEY}&q=${this.state.userCityChoice}&format=json`);
+    
+  }
 
-        let movieData = await axios.get(`${process.env.REACT_APP_SERVER}/movie?movieSearch=${this.state.userCityChoice}`)
+  this.getCityObject = async () => {
+    try{
+      let url = `${process.env.REACT_APP_SERVER}/city?city=${this.state.searchQuery}`
+      let cityObjectData = await axios.get(url)
+      this.setState({
+        cityObject: cityObjectData.data,
+        cityLat: cityObjectData.data.lat,
+        cityLon: cityObjectData.data.lon
+      })
+      this.getWeatherObject(cityObjectData.data.lat, cityObjectData.data.lon);
 
-
-        this.setState({
-          // weatherData: weatherData.data,
-          userCityData: userCityChoiceData.data[0],
-          userCityDataName: userCityChoiceData.data[0].display_name,
-          userCityDataLat: userCityChoiceData.data[0].lat,
-          userCityDataLon: userCityChoiceData.data[0].lon,
-        })
-        console.log(movieData);
-      } catch (error) {
-        alert(`Sorry, you have an error of ${error.response.status}`)
-      }
+    }catch(error){
+      console.log(error.message);
     }
   }
+
+  this.getMovieObject = async () => {
+    try{
+      let url = `${process.env.REACT_APP_SERVER}/movie?city=${this.state.searchQuery}`
+      let movieObjectData = await axios.get(url)
+      this.setState({
+        movieObjectArr: movieObjectData.data
+      })
+    }catch(error){
+      console.log(error.message);
+    }
+  }
+  this.getWeatherObject = async (lat, lon) => {
+    try{
+      let url = `${process.env.REACT_APP_SERVER}/weather?lat=${lat}&lon=${lon}`
+      let weatherObjectData = await axios.get(url)
+      this.setState({
+        weatherObject: weatherObjectData.data
+      })
+      console.log(weatherObjectData.data)
+    }catch(error){
+      console.log(error.message);
+    }
+  }
+
+  // function to get weather info
+
+
+
+
+}
   
   
   render() {
@@ -59,7 +90,7 @@ class App extends React.Component {
           </label>
           <button type='submit'>Let's Go</button>
         </form>
-        <SearchResults city={this.state.userCityDataName} lat={this.state.userCityDataLat} lon={this.state.userCityDataLon} />
+        <SearchResults cityName={this.state.cityObject.name} lat={this.state.cityLat} lon={this.state.cityLon}/>
       </>
     )
   }
