@@ -1,3 +1,6 @@
+AWS GUI Deployed Link: http://cityexplorerapi-env.eba-8suumtzx.us-west-2.elasticbeanstalk.com/
+AWS CLI Deployed Link: http://cityexplorergui-env-1.eba-kiizsfnk.us-west-2.elasticbeanstalk.com/
+
 **Author**: Anthony Keith
 **Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)
 
